@@ -1,0 +1,2 @@
+This text is saved using the 'with' statement.
+The file will be automatically closed.

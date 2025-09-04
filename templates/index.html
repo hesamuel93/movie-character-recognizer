@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Character Recognizer</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Character Recognizer</h1>
+
+    <h2>Upload Character Images</h2>
+    <input type="text" id="charName" placeholder="Character Name"><br><br>
+    <input type="file" id="charImages" multiple onchange="previewImages('charImages', 'charPreview')"><br><br>
+    <div id="charPreview" style="display:flex; gap:10px;"></div>
+    <button onclick="uploadCharacter()">Upload Character Images</button>
+
+    <h2></h2>
+    <form action="/" method="post">
+    <button>Save Character</button>
+    </form>
+
+    <h2>Recognize Character</h2>
+    <input type="file" id="testImage" onchange="previewImages('testImage', 'testPreview')"><br><br>
+    <div id="testPreview" style="display:flex; gap:10px;"></div>
+    <button onclick="recognizeCharacter()">Recognize Character</button>
+
+    <p id="result"></p>
+
+    <!--<h2></h2>
+    <form method="POST" action="/character_page">
+    <select name="characterSelect">
+        {% for n in names %}
+            <option value="{{n}}">{{ n }}</option>
+        {% endfor %}
+    </select>
+    <button id="galleryButton">Go to Gallery</button>
+    </form>
+
+    <script>
+        document.getElementById('galleryButton').addEventListener('click', function() {
+            window.location.href = '/character_page';
+        });
+    </script> -->
+
+    <script src="static/script.js"></script>
+</body>
+</html>
