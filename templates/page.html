@@ -1,17 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>{{name}} Gallery</title>
     <meta charset="UTF-8">
+    <title>{{name}} Gallery</title>
+    <style>
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .gallery img {
+            width: 200px;
+            height: auto;
+            object-fit: cover;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-    <h1>{{name}} Gallery</h1>
-    <div>
-      {% for image in images %}
-      
-      {% endfor %}
-    </div>
 
-    <script src="static/script.js"></script>
+<h1>{{name}} Gallery</h1>
+<button id="backButton">Back</button>
+<script>
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.location.href = '/';
+        });
+</script>
+<div class="gallery" id="imageGallery">
+    {% for url in image_urls %}
+        <img src="{{ url }}" alt="Image">
+    {% endfor %}
+</div>
+
 </body>
 </html>
