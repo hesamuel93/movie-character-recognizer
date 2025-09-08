@@ -1,15 +1,16 @@
 # Movie Character Recognizer
 Upload images of a specific movie/TV/comic character that your are a fan of, or even images of original characters that you created/designed yourself.
-Then, if you have more images of characters, and you want to group them together into one collection, you can do so using this tool.
+Then, if you have multiple images of different characters inside a folder, and you want to have them sorted by the specific characters in each image, you can do so using this tool.
 
 ## How It's Made
-The tool mainly uses the CLIP model from OpenAI, as well as cosine similarity tests, to analyze the images and recognize the characters. The app can be run on the web, with a backend built on Python and a frontend built on Javascript and HTML.
+The tool mainly uses the CLIP model from OpenAI, as well as cosine similarity tests, to analyze the images and recognize the characters. The app can be run locally, with a backend built on Python and a frontend built on Javascript and HTML.
 
 ## Usage
 Once you clone/download this project, you can use it by first executing the *python "app.py"* command.
 Then, open the html file or go to *http://127.0.0.1:5000* in your browser to run the web app.
-You can upload as many images for a character as you want, and when you are done you can press the "Save Character" button to have it saved.
-To recognize a character from an image, upload the image and just press the "Recognize Character" button.
+Upload a small amount of images for a character, and when you are done you can press the "Upload Character" button to have that character's embeddings saved.
+Then, to sort a folder of different character images, upload the folder using the "Recognize Character" feature. The images will be sorted by character in the 'static/characters' directory.
+You can also view the images of a character using the "View Gallery" option.
 
 ## Possible Improvements
-I'm working on making it so that you can recognize multiple characters from a folder of images, so that they can eventually be sorted. I also want to display the images of each character in a gallery format, which will require more work on the HTML and Javascript parts of the app.
+Compatability for if multiple characters are in a single image, and storage for images with no character matches.
