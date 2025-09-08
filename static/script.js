@@ -11,20 +11,20 @@ async function uploadCharacter() {
         body: formData
     });
     alert(await res.text());
+    window.location.reload();
 }
 
 async function recognizeCharacter() {
-    let file = document.getElementById("testImage").files[0];
+    let files = document.getElementById("folderInput").files;
     let formData = new FormData();
-    formData.append("image", file);
+    for (let f of files) {
+        formData.append("images", f);
+    }
     let res = await fetch("/recognize", {
         method: "POST",
         body: formData
     });
-    let data = await res.json();
-    document.getElementById("result").innerText =
-        "Best match: " + (data.name || "None") +
-        " (score: " + data.score.toFixed(3) + ")";
+    alert(await res.text());
 }
 
 function previewImages(inputId, previewId) {
