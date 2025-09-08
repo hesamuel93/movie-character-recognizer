@@ -1,11 +1,10 @@
 from pathlib import Path
-from flask import Flask, request, jsonify, send_from_directory, render_template
+from flask import Flask, request, jsonify, render_template, url_for
 from PIL import Image
 import torch
 from transformers import CLIPProcessor, CLIPModel
 import io
 import os
-from werkzeug.utils import secure_filename
 TEMPLATES_AUTO_RELOAD = True
 
 app = Flask(__name__)
@@ -15,32 +14,28 @@ model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(device)
 processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
 character_db = {}
-character_names = []
-character_images = []
-current_name = ''
-current_images = []
+character_path = os.path.join('static', 'characters')
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-#app.config['UPLOAD_FOLDER'] = os.path.join('static', 'characters')
-#os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+THRESHOLD = 0.75
+
+ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"}
 
 @app.route("/")
 def index():
-    names = character_names
-    return render_template('index.html', names=names)
-
-@app.route("/", methods=["POST"])
-def saveCharacter():
-    character_names.append(current_name)
-    character_images.append(current_images)
-    names = character_names
+    names = os.listdir(character_path)
     return render_template('index.html', names=names)
 
 @app.route("/character_page", methods=["POST"])
 def character_page():
-    n = request.form.get('characterSelect')
-    character_index = character_names.index(n)
-    return render_template('page.html', images=character_images[character_index], name=character_names[character_index])
+    name = request.form.get('characterSelect')
+    image_folder = os.path.join('static', 'characters', name)
+    image_filenames = os.listdir(image_folder)
+    image_urls = []
+    for filename in image_filenames:
+        path = os.path.join('characters', name, filename)
+        path = path.replace("\\", "/")
+        image_urls.append(url_for('static', filename=path))
+    return render_template('page.html', image_urls=image_urls, name = name)
 
 #Extract CLIP embedding
 def get_embedding(image_bytes):
@@ -55,24 +50,29 @@ def get_embedding(image_bytes):
 def uploadCharacter():
     name = request.form.get("name")
     files = request.files.getlist("images")
+    for file in files:
+        if not allowed_files(file.filename):
+            return "Only images allowed", 400
     path = os.path.join('static', 'characters', name)
+    character_names = os.listdir(character_path)
     if not name or not files:
         return "Name and images required", 400
     
     if name in character_names:
         path = os.path.join('static', 'characters', name)
-        return "Character already added", 400
+        for file in files:
+            imageObject = Image.open(file)
+            savePath = os.path.join(path, file.filename)
+            imageObject.save(savePath)
+        return "Character added to existing list", 400
     else:
         path = os.path.join('static', 'characters', name)
         os.mkdir(path, mode = 0o777)
+        character_names.append(name)
 
     embeddings = [get_embedding(f.read()) for f in files]
     avg_embedding = torch.mean(torch.stack(embeddings), dim=0)
     character_db[name] = avg_embedding
-    global current_name
-    current_name = name
-    global current_images
-    current_images = files
 
     for file in files:
         imageObject = Image.open(file)
@@ -81,12 +81,10 @@ def uploadCharacter():
 
     return f"Character '{name}' uploaded with {len(files)} images!"
 
-@app.route("/recognize", methods=["POST"])
-def recognizeCharacter():
+def recognizeCharacter(file):
     if not character_db:
         return jsonify({"name": None, "score": 0})
 
-    file = request.files["image"]
     test_emb = get_embedding(file.read())
 
     best_name = None
@@ -97,11 +95,31 @@ def recognizeCharacter():
             best_score = score
             best_name = name
 
-    character_index = character_names.index(best_name)
-    character_images[character_index].append(file)
+    if best_score > THRESHOLD:
+        path = os.path.join('static', 'characters', best_name)
+        imageObject = Image.open(file)
+        filename = os.path.basename(file.filename)
+        savePath = os.path.join(path, filename)
+        imageObject.save(savePath)
 
+@app.route("/recognize", methods=["POST"])
+def recognize():
+    files = request.files.getlist("images")
+    for file in files:
+        if not allowed_files(file.filename):
+            return "Only images allowed", 400
+    for file in files:
+        recognizeCharacter(file)
+    
+    return f"All characters recognized and sorted"
 
-    return jsonify({"name": best_name, "score": best_score})
+def allowed_files(filename):
+    isImage = False
+    for i in ALLOWED_EXTENSIONS:
+        if i in filename:
+            isImage = True
+    return isImage
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
