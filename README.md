@@ -1,4 +1,5 @@
-# Purpose - Recognize Movie/Cartoon Characters from Images
+# Recognize and Sort Movie/Cartoon Characters from Images
+## Purpose
 Suppose that you have collected images of your favorite movie/TV/comic characters, perhaps by mass downloading from online image galleries. You put all the images in one folder, but it ends up being too large and messy, with too many different characters. You can use this tool to sort them into smaller, more accessible subfolders.
 
 ## Uploading Images for Recognition
