@@ -15,10 +15,12 @@ processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
 character_db = {}
 character_path = os.path.join('static', 'characters')
+unknownDirectory = os.path.join(character_path, 'UNKNOWN')
 
-THRESHOLD = 0.75
+THRESHOLD = 0.85
 
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"}
+RESTRICTED_NAMES = {"UNKNOWN"}
 
 @app.route("/")
 def index():
@@ -50,6 +52,8 @@ def get_embedding(image_bytes):
 def uploadCharacter():
     name = request.form.get("name")
     files = request.files.getlist("images")
+    if name in RESTRICTED_NAMES:
+        return "Character cannot have that name", 400
     for file in files:
         if not allowed_files(file.filename):
             return "Only images allowed", 400
@@ -87,20 +91,26 @@ def recognizeCharacter(file):
 
     test_emb = get_embedding(file.read())
 
-    best_name = None
-    best_score = -1
+    best_names = []
     for name, emb in character_db.items():
         score = torch.nn.functional.cosine_similarity(test_emb, emb).item()
-        if score > best_score:
-            best_score = score
-            best_name = name
+        if score > THRESHOLD:
+            best_names.append(name)
+    
+    if not best_names:
+        path = unknownDirectory
+        imageObject = Image.open(file)
+        filename = os.path.basename(file.filename)
+        savePath = os.path.join(path, filename)
+        imageObject.save(savePath)
 
-    if best_score > THRESHOLD:
+    for best_name in best_names:
         path = os.path.join('static', 'characters', best_name)
         imageObject = Image.open(file)
         filename = os.path.basename(file.filename)
         savePath = os.path.join(path, filename)
         imageObject.save(savePath)
+
 
 @app.route("/recognize", methods=["POST"])
 def recognize():
