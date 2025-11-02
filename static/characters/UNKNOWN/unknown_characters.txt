@@ -1,0 +1,1 @@
+All characters that cannot be recognized are stored in UNKNOWN directory
