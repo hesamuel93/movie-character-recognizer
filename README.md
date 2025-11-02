@@ -1,5 +1,4 @@
 # Recognize and Sort Movie/Cartoon Characters from Images
-## Purpose
 Suppose that you have collected images of your favorite movie/TV/comic characters, perhaps by mass downloading from online image galleries. You put all the images in one folder, but it ends up being too large and messy, with too many different characters. You can use this tool to sort them into smaller, more accessible subfolders.
 
 ## Uploading Images for Recognition
@@ -12,8 +11,8 @@ Have a folder with all the character images that you want to be sorted. Upload t
 The tool mainly uses the CLIP model from OpenAI, as well as cosine similarity tests, to analyze the images and recognize the characters. The app can be run locally, with a backend built on Python and a frontend built on Javascript and HTML.
 
 ## Usage
-Once you clone/download this project, you can use it by first executing the *python "app.py"* command.
-Then, open the html file or go to *http://127.0.0.1:5000* in your browser to run the web app.
+Once you clone/download this project, you can use it by first executing the *python "app.py"* command in your terminal.
+Then, go to *http://127.0.0.1:5000* in your browser to run the web app.
 Upload 3 to 5 images for a character, and when you are done you can press the "Upload Character" button to have that character's embeddings saved.
 Then, to sort a folder of different character images, upload the folder using the "Recognize Characters" feature. The images will be sorted by character in the 'static/characters' directory.
 You can view the total images of a character using the "View Gallery" option.
